@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>勤怠打刻アプリ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3498db">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+<body>
+
+    <div id="app">
+        <header>
+            <h1>勤怠打刻</h1>
+        </header>
+
+        <main id="main-content">
+            <div id="login-view" class="view active">
+                <h2>ログイン</h2>
+                <form id="login-form">
+                    <input type="text" id="user-id" placeholder="従業員IDを入力" required>
+                    <button type="submit">ログイン</button>
+                </form>
+            </div>
+
+            <div id="main-view" class="view">
+                <p>ようこそ、<span id="display-user-id"></span>さん</p>
+                <div class="card">
+                    <button id="clock-in-btn">出勤</button>
+                    <button id="clock-out-btn" style="display: none;">退勤</button>
+                </div>
+                <div class="card">
+                    <button id="report-task-btn">課題完了報告</button>
+                </div>
+                <button id="logout-btn">ログアウト</button>
+            </div>
+        </main>
+
+        <footer>
+            <p id="status-message"></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
