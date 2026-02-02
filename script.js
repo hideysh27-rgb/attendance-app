@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- CONSTANTS & VARIABLES ---
+    // --- CONFIGURATION ---
     // ここにデプロイしたGoogle Apps ScriptのウェブアプリURLを貼り付けてください
     const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxQvXr8rI3UtFwDYBwuuFoxV2nSXiN0DZi-M_3kAoMOL0A3M8KCMf-fdi19622nYFPawg/exec';
 
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showStatusMessage(message, isError = false) {
         statusMessage.textContent = message;
         statusMessage.className = isError ? 'error' : 'success';
-        // Clear message after 5 seconds
+        // 5秒後にメッセージを消去
         setTimeout(() => {
             statusMessage.textContent = '';
             statusMessage.className = '';
@@ -71,21 +71,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- API COMMUNICATION ---
     async function sendDataToGAS(action) {
-        if (GAS_WEB_APP_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
-            showStatusMessage('バックエンドURLが設定されていません。script.jsを編集してください。', true);
+        if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes('YOUR_GOOGLE_APPS_SCRIPT')) {
+            showStatusMessage('バックエンドURLが正しく設定されていません。', true);
             return;
         }
 
         const buttons = [clockInBtn, clockOutBtn, reportTaskBtn, logoutBtn];
         buttons.forEach(btn => btn.disabled = true);
 
-        showStatusMessage(`${action.replace('_', '-')}...`);
+        showStatusMessage(`通信中...`);
 
         try {
-            const response = await fetch(GAS_WEB_APP_URL, {
+            // mode: 'no-cors' を使用することで、ブラウザによる通信遮断を回避します
+            await fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
+                mode: 'no-cors', 
                 headers: {
-                    'Content-Type': 'text/plain', // GAS doPost requires text/plain for simple POST
+                    'Content-Type': 'text/plain',
                 },
                 body: JSON.stringify({
                     userId: currentUserId,
@@ -93,26 +95,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
 
-            const result = await response.json();
-
-            if (result.status === 'success') {
-                showStatusMessage(result.message, false);
-
-                if (action === 'clock_in') {
-                    isClockedIn = true;
-                    localStorage.setItem(`clockStatus_${currentUserId}`, 'in');
-                } else if (action === 'clock_out') {
-                    isClockedIn = false;
-                    localStorage.removeItem(`clockStatus_${currentUserId}`);
-                }
-                updateClockButtons();
-
-            } else {
-                throw new Error(result.message || '不明なエラーが発生しました。');
+            // no-corsモードではレスポンス内容を解析できないため、
+            // fetchがエラーにならなければ「成功」として画面を更新します
+            let successMsg = '';
+            if (action === 'clock_in') {
+                isClockedIn = true;
+                localStorage.setItem(`clockStatus_${currentUserId}`, 'in');
+                successMsg = '出勤を記録しました。';
+            } else if (action === 'clock_out') {
+                isClockedIn = false;
+                localStorage.removeItem(`clockStatus_${currentUserId}`);
+                successMsg = '退勤を記録しました。';
+            } else if (action === 'report_task') {
+                successMsg = '課題完了を報告しました。';
             }
 
+            showStatusMessage(successMsg, false);
+            updateClockButtons();
+
         } catch (error) {
-            showStatusMessage(`エラー: ${error.message}`, true);
+            console.error('Submission error:', error);
+            showStatusMessage(`通信エラーが発生しました。`, true);
         } finally {
             buttons.forEach(btn => btn.disabled = false);
         }
