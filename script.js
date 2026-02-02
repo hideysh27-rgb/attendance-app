@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- CONSTANTS & VARIABLES ---
     // ここにデプロイしたGoogle Apps ScriptのウェブアプリURLを貼り付けてください
-    const GAS_WEB_APP_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+    const GAS_WEB_APP_URL = https://script.google.com/macros/s/AKfycbxQvXr8rI3UtFwDYBwuuFoxV2nSXiN0DZi-M_3kAoMOL0A3M8KCMf-fdi19622nYFPawg/exec;
 
     const loginView = document.getElementById('login-view');
     const mainView = document.getElementById('main-view');
